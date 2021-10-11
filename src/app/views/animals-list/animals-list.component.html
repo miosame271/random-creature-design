@@ -1,0 +1,22 @@
+<div class="animals-list-container">
+    <mat-spinner *ngIf="loading; else container" [diameter]="50"></mat-spinner>
+
+    <ng-template #container>
+        <p *ngIf="!randomThree.length; else animals">
+            Что-то пошло не так :(
+        </p>
+
+        <ng-template #animals>
+            <div class="animals-list">
+                <animal *ngFor="let item of randomThree" [animal]="item"></animal>
+            </div>
+
+            <button mat-raised-button
+                    color="accent"
+                    (click)="getRandomThree()">
+                Сгенерировать новый набор
+            </button>
+        </ng-template>
+    </ng-template>
+</div>
+
