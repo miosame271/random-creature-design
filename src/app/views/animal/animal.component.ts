@@ -13,6 +13,8 @@ export class AnimalComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        console.log(this.animal)
     }
+
 
 }

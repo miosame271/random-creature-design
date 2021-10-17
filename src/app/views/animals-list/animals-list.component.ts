@@ -45,7 +45,7 @@ export class AnimalsListComponent implements OnInit {
             return;
         }
 
-        const emptyArr = Array.from({ length: 3 });
+        const newArr = [];
         const getRandom = (): number => {
             const randomIndex = Math.floor(Math.random() * limit);
 
@@ -57,17 +57,24 @@ export class AnimalsListComponent implements OnInit {
             return getRandom();
         }
 
-        for (const item of emptyArr) {
+        for (const item of Array.from({length: 3})) {
             const index = getRandom();
             const id = this.list[index];
 
             // добавляем по одному, исключая возможность повтора
-            this.randomThree.push({ id });
+            newArr.push({id});
         }
 
-        this.randomThree.map((item) => {
-            const wikiInfo = this.wikiService.getAnimalInfo(item.id).subscribe((result) => {
-                console.log('wiki info', result)
+        // @ts-ignore
+        this.randomThree = newArr.map((item) => {
+            return this.wikiService.getAnimalInfo(item.id).subscribe((result) => {
+                const info: any = Object.values(result.query.pages)[0];
+
+                return {
+                    id: item.id,
+                    title: info.title,
+                    text: info.extract
+                }
             });
         })
 

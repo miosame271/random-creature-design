@@ -11,7 +11,7 @@ export class WikiService {
     }
 
     getAnimalInfo(animalTitle: string): Observable<Record<string, any>> {
-        const url = `?action=parse&page=${ animalTitle }&format=json`;
+        const url = `/wiki/api.php?format=json&action=query&prop=extracts&exintro&explaintext&exlimit=50&titles=${ animalTitle }`;
         const headers = new HttpHeaders({
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
