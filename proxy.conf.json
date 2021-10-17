@@ -1,0 +1,11 @@
+{
+    "/api": {
+        "target": "https://ru.wikipedia.org/w/api.php",
+        "secure": true,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/api": ""
+        }
+    }
+}
+

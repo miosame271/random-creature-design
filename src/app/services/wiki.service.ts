@@ -11,11 +11,13 @@ export class WikiService {
     }
 
     getAnimalInfo(animalTitle: string): Observable<Record<string, any>> {
-        const url = `https://ru.wikipedia.org/w/api.php?action=parse&page=${ animalTitle }&format=json`;
-        const headers = new HttpHeaders();
-
-        headers.append('Content-Type', 'application/json; charset=utf-8');
-        headers.append('Access-Control-Allow-Origin', '*');
+        const url = `?action=parse&page=${ animalTitle }&format=json`;
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+            "Access-Control-Allow-Headers": "Access-Control-Allow-Origin, Content-Type, Accept, Accept-Language, Origin, User-Agent"
+        });
 
         return this.http.get(url, { headers });
     }
