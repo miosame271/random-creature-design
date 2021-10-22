@@ -1,4 +1,5 @@
 export interface Animal {
-    id: string;
-    ruTitle?: string;
+    title: string;
+    text?: string;
+    image?: string;
 }

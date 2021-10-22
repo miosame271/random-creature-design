@@ -1,14 +1,20 @@
 <mat-card class="animal-card">
     <mat-card-header>
-        <mat-card-title>{{ animal.ruTitle }}</mat-card-title>
+        <mat-card-title>{{ animal.title }}</mat-card-title>
     </mat-card-header>
+
+    <div class="image-container" style="background-image: url({{ animal.image }})">
+        <span *ngIf="!animal.image">Нет картинки :(</span>
+    </div>
+
+    <mat-card-content>{{ animal.text }}</mat-card-content>
 
     <mat-card-actions>
         <a mat-button
            color="primary"
-           href="https://www.pinterest.ru/search/pins/?q={{ animal.id }} animal photo"
+           href="https://www.pinterest.ru/search/pins/?q={{ animal.title }} animal photo"
            target="_blank">
-            Поиск изображений на Pinterest
+            Поиск на Pinterest
         </a>
     </mat-card-actions>
 </mat-card>

@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { AnimalsService } from '../../services/animals.service';
-import { Animal } from '../../interfaces/types';
-import { WikiService } from '../../services/wiki.service';
+import { combineLatest, Observable, of } from 'rxjs';
+
+import { AnimalsService, WikiService } from '../../services';
+
+import type { Animal } from '../../interfaces/types';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'animals-list',
@@ -9,24 +12,19 @@ import { WikiService } from '../../services/wiki.service';
     styleUrls: ['./animals-list.component.scss']
 })
 export class AnimalsListComponent implements OnInit {
-    private list: string[] = []
+    private list: string[] = [];
 
-    loading: boolean = false;
-    randomThree: Animal[] = [];
+    randomThreeIds: string[] = [];
+    randomThreeAnimals$: Observable<Animal[]> = of([]);
 
     constructor(private animalService: AnimalsService, private wikiService: WikiService) {
     }
 
     async ngOnInit(): Promise<void> {
-        this.loading = true;
-
         await this.getList();
-        await this.getRandomThree();
     }
 
     async generateRandomThree(): Promise<void> {
-        this.loading = true;
-
         await this.getRandomThree();
     }
 
@@ -38,48 +36,68 @@ export class AnimalsListComponent implements OnInit {
         const limit = this.list.length;
 
         // обнуляем предыдущее значение
-        this.randomThree = [];
+        this.randomThreeIds = [];
 
         // нет смысла в поиске рандомных значений, если список слишком короткий
         if (limit < 3) {
             return;
         }
 
-        const newArr = [];
+        // функция возвращает рандомный айдишник
         const getRandom = (): number => {
             const randomIndex = Math.floor(Math.random() * limit);
 
             // исключаем несуществующие индексы и те, что уже есть в выборке
-            if (this.list[randomIndex] && !this.randomThree[randomIndex]) {
+            if (this.list[randomIndex] && !this.randomThreeIds[randomIndex]) {
                 return randomIndex;
             }
 
             return getRandom();
         }
 
+        // наполняем массив айдишников
         for (const item of Array.from({length: 3})) {
             const index = getRandom();
             const id = this.list[index];
 
             // добавляем по одному, исключая возможность повтора
-            newArr.push({id});
+            this.randomThreeIds.push(id);
         }
 
-        // @ts-ignore
-        this.randomThree = newArr.map((item) => {
-            return this.wikiService.getAnimalInfo(item.id).subscribe((result) => {
-                const info: any = Object.values(result.query.pages)[0];
+        // наполняем массив объектов с данными о животных
+        this.randomThreeAnimals$ = combineLatest(this.randomThreeIds.map(id => {
+            const animalInfo = combineLatest([
+                this.wikiService.getPageContents(id),
+                this.wikiService.getPageImage(id)
+            ]);
 
-                return {
-                    id: item.id,
-                    title: info.title,
-                    text: info.extract
-                }
-            });
-        })
+            return animalInfo.pipe(map((values) => {
+                const result: Animal = {
+                    title: id
+                };
 
-        this.loading = false;
+                values.forEach((value) => {
+                    const pages: Record<string, any> = value.query.pages;
+
+                    // данных нет - возвращаем только title
+                    if (!pages || !Object.keys(pages).length) {
+                        return;
+                    }
+
+                    const data: Record<string, any> = Object.values(pages)[0];
+
+                    if (data.extract) {
+                        result.text = `${ data.extract.slice(0, 100) }...`;
+                    }
+
+                    if (data.thumbnail) {
+                        result.image = data.thumbnail.source;
+                    }
+                });
+
+                return result;
+            }));
+        }));
     }
-
 }
 

@@ -1,22 +1,18 @@
 <div class="animals-list-container">
-    <mat-spinner *ngIf="loading; else container" [diameter]="50"></mat-spinner>
+    <button mat-raised-button
+            color="accent"
+            (click)="getRandomThree()">
+        Сгенерировать набор
+    </button>
 
-    <ng-template #container>
-        <p *ngIf="!randomThree.length; else animals">
-            Что-то пошло не так :(
-        </p>
+    <div class="animals-list" *ngIf="randomThreeAnimals$ | async as randomThreeAnimals; else loader">
+        <animal *ngFor="let item of randomThreeAnimals" [animal]="item"></animal>
+    </div>
 
-        <ng-template #animals>
-            <div class="animals-list">
-                <animal *ngFor="let item of randomThree" [animal]="item"></animal>
-            </div>
-
-            <button mat-raised-button
-                    color="accent"
-                    (click)="getRandomThree()">
-                Сгенерировать новый набор
-            </button>
-        </ng-template>
+    <ng-template #loader>
+        <div class="loader">
+            <mat-spinner [diameter]="50"></mat-spinner>
+        </div>
     </ng-template>
 </div>
 
