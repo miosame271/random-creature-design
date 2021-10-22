@@ -14,22 +14,21 @@ import { map } from 'rxjs/operators';
 export class AnimalsListComponent implements OnInit {
     private list: string[] = [];
 
+    readonly list$: Promise<string[]>;
+
     randomThreeIds: string[] = [];
     randomThreeAnimals$: Observable<Animal[]> = of([]);
 
     constructor(private animalService: AnimalsService, private wikiService: WikiService) {
+        this.list$ = this.animalService.getAnimals();
     }
 
     async ngOnInit(): Promise<void> {
-        await this.getList();
+        this.list = await this.list$;
     }
 
     async generateRandomThree(): Promise<void> {
         await this.getRandomThree();
-    }
-
-    async getList(): Promise<void> {
-        this.list = await this.animalService.getAnimals();
     }
 
     async getRandomThree(): Promise<void> {
