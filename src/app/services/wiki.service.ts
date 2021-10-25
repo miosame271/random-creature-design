@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment.prod';
+import { createLogErrorHandler } from '@angular/compiler-cli/ngcc/src/execution/tasks/completion';
 
 @Injectable({
     providedIn: 'root'
@@ -23,6 +24,8 @@ export class WikiService {
     }
 
     getPageContents(animalTitle: string): Observable<Record<string, any>> {
+        console.log(this._mainUrl)
+
         const url = `${ this._mainUrl }&prop=extracts&exintro&explaintext&exlimit=50&titles=${ animalTitle }`;
 
         return this.http.get(url, { headers: this._headers });
