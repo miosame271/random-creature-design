@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
     providedIn: 'root'
 })
 export class WikiService {
-    private readonly _mainUrl = '/wiki/api.php?format=json&action=query';
+    private readonly _mainUrl = 'https://crossorigin.me/https://en.wikipedia.org/w/wiki/api.php?format=json&action=query';
     private readonly _headers: HttpHeaders;
 
     constructor(private http: HttpClient) {
