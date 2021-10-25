@@ -6,6 +6,14 @@
         "pathRewrite": {
             "^/wiki": ""
         }
+    },
+    "https://miosame271.github.io/random-creature-design/wiki": {
+        "target": "https://en.wikipedia.org/w",
+        "secure": true,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/wiki": ""
+        }
     }
 }
 
