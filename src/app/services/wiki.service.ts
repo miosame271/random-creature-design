@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+import { environment } from '../../environments/environment.prod';
 
 @Injectable({
     providedIn: 'root'
 })
 export class WikiService {
-    private readonly _mainUrl = '/wiki/api.php?format=json&action=query';
+    private readonly _mainUrl = environment.production
+        ? 'https://en.wikipedia.org/w/wiki/api.php?format=json&action=query'
+        : '/wiki/api.php?format=json&action=query';
     private readonly _headers: HttpHeaders;
 
     constructor(private http: HttpClient) {
