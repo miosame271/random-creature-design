@@ -2,7 +2,7 @@
     "/wiki": {
         "target": "https://en.wikipedia.org/w",
         "secure": true,
-        "changeOrigin": true,
+        "changeOrigin": false,
         "pathRewrite": {
             "^/wiki": ""
         }
