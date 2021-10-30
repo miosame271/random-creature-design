@@ -13,7 +13,6 @@ export class AnimalsService {
     }
 
     getAnimals(): Observable<string[]> {
-        // @ts-ignore
-        return this.http.get(`${ this._mainUrl }/animals`, { headers: this.common.headers });
+        return this.http.get<string[]>(`${ this._mainUrl }/animals`, { headers: this.common.headers });
     }
 }
