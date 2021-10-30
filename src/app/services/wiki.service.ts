@@ -1,33 +1,26 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { CommonService } from './common.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class WikiService {
-    private readonly _mainUrl = 'https://crossorigin.me/https://en.wikipedia.org/w/wiki/api.php?format=json&action=query';
-    private readonly _headers: HttpHeaders;
+    private readonly _mainUrl = '/wiki/api.php?format=json&action=query';
 
-    constructor(private http: HttpClient) {
-        this._headers = new HttpHeaders({
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-            "Access-Control-Allow-Headers": "Access-Control-Allow-Origin, Content-Type, Accept, Accept-Language, Origin, User-Agent"
-        });
+    constructor(private http: HttpClient, private common: CommonService) {
     }
 
     getPageContents(animalTitle: string): Observable<Record<string, any>> {
-        console.log(this._mainUrl)
         const url = `${ this._mainUrl }&prop=extracts&exintro&explaintext&exlimit=50&titles=${ animalTitle }`;
 
-        return this.http.get(url, { headers: this._headers });
+        return this.http.get(url, { headers: this.common.headers });
     }
 
     getPageImage(animalTitle: string): Observable<Record<string, any>> {
         const url = `${ this._mainUrl }&prop=pageimages&pithumbsize=500&titles=${ animalTitle }`;
 
-        return this.http.get(url, { headers: this._headers });
+        return this.http.get(url, { headers: this.common.headers });
     }
 }

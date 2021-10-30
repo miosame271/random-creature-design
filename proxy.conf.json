@@ -1,8 +1,8 @@
 {
-    "/wiki": {
+    "http://localhost:4200/wiki": {
         "target": "https://en.wikipedia.org/w",
         "secure": true,
-        "changeOrigin": false,
+        "changeOrigin": true,
         "pathRewrite": {
             "^/wiki": ""
         }

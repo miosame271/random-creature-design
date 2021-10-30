@@ -12,9 +12,7 @@ import { map } from 'rxjs/operators';
     styleUrls: ['./animals-list.component.scss']
 })
 export class AnimalsListComponent implements OnInit {
-    private list: string[] = [];
-
-    readonly list$: Promise<string[]>;
+    readonly list$: Observable<string[]>;
 
     randomThreeIds: string[] = [];
     randomThreeAnimals$: Observable<Animal[]> = of([]);
@@ -23,80 +21,77 @@ export class AnimalsListComponent implements OnInit {
         this.list$ = this.animalService.getAnimals();
     }
 
-    async ngOnInit(): Promise<void> {
-        this.list = await this.list$;
+    ngOnInit(): void {
     }
 
-    async generateRandomThree(): Promise<void> {
-        await this.getRandomThree();
-    }
+    generateRandomThree(): void {
+        this.list$.subscribe((list) => {
+            const limit = list.length;
 
-    async getRandomThree(): Promise<void> {
-        const limit = this.list.length;
+            // обнуляем предыдущее значение
+            this.randomThreeIds = [];
 
-        // обнуляем предыдущее значение
-        this.randomThreeIds = [];
-
-        // нет смысла в поиске рандомных значений, если список слишком короткий
-        if (limit < 3) {
-            return;
-        }
-
-        // функция возвращает рандомный айдишник
-        const getRandom = (): number => {
-            const randomIndex = Math.floor(Math.random() * limit);
-
-            // исключаем несуществующие индексы и те, что уже есть в выборке
-            if (this.list[randomIndex] && !this.randomThreeIds[randomIndex]) {
-                return randomIndex;
+            // нет смысла в поиске рандомных значений, если список слишком короткий
+            if (limit < 3) {
+                return;
             }
 
-            return getRandom();
-        }
+            // функция возвращает рандомный айдишник
+            const getRandom = (): number => {
+                const randomIndex = Math.floor(Math.random() * limit);
 
-        // наполняем массив айдишников
-        for (const item of Array.from({length: 3})) {
-            const index = getRandom();
-            const id = this.list[index];
+                // исключаем несуществующие индексы и те, что уже есть в выборке
+                if (list[randomIndex] && !this.randomThreeIds[randomIndex]) {
+                    return randomIndex;
+                }
 
-            // добавляем по одному, исключая возможность повтора
-            this.randomThreeIds.push(id);
-        }
+                return getRandom();
+            }
 
-        // наполняем массив объектов с данными о животных
-        this.randomThreeAnimals$ = combineLatest(this.randomThreeIds.map(id => {
-            const animalInfo = combineLatest([
-                this.wikiService.getPageContents(id),
-                this.wikiService.getPageImage(id)
-            ]);
+            // наполняем массив айдишников
+            for (const item of Array.from({length: 3})) {
+                const index = getRandom();
+                const id = list[index];
 
-            return animalInfo.pipe(map((values) => {
-                const result: Animal = {
-                    title: id
-                };
+                // добавляем по одному, исключая возможность повтора
+                this.randomThreeIds.push(id);
+            }
 
-                values.forEach((value) => {
-                    const pages: Record<string, any> = value.query.pages;
+            // наполняем массив объектов с данными о животных
+            this.randomThreeAnimals$ = combineLatest(this.randomThreeIds.map(id => {
+                const animalInfo = combineLatest([
+                    this.wikiService.getPageContents(id),
+                    this.wikiService.getPageImage(id)
+                ]);
 
-                    // данных нет - возвращаем только title
-                    if (!pages || !Object.keys(pages).length) {
-                        return;
-                    }
+                return animalInfo.pipe(map((values) => {
+                    const result: Animal = {
+                        title: id
+                    };
 
-                    const data: Record<string, any> = Object.values(pages)[0];
+                    values.forEach((value) => {
+                        const pages: Record<string, any> = value.query.pages;
 
-                    if (data.extract) {
-                        result.text = `${ data.extract.slice(0, 100) }...`;
-                    }
+                        // данных нет - возвращаем только title
+                        if (!pages || !Object.keys(pages).length) {
+                            return;
+                        }
 
-                    if (data.thumbnail) {
-                        result.image = data.thumbnail.source;
-                    }
-                });
+                        const data: Record<string, any> = Object.values(pages)[0];
 
-                return result;
+                        if (data.extract) {
+                            result.text = `${ data.extract.slice(0, 100) }...`;
+                        }
+
+                        if (data.thumbnail) {
+                            result.image = data.thumbnail.source;
+                        }
+                    });
+
+                    return result;
+                }));
             }));
-        }));
+        });
     }
 }
 
